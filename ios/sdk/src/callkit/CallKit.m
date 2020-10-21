@@ -112,10 +112,6 @@ RCT_EXPORT_METHOD(setMuted:(NSString *)callUUID
 RCT_EXPORT_METHOD(setProviderConfiguration:(NSDictionary *)dictionary) {
     DDLogInfo(@"[RNCallKit][setProviderConfiguration:] dictionary = %@", dictionary);
 
-    if (![JMCallKitProxy isProviderConfigured]) {
-        [self configureProviderFromDictionary:dictionary];
-    }
-
     // register to receive CallKit proxy events
     [JMCallKitProxy addListener:self];
 }
@@ -211,48 +207,6 @@ RCT_EXPORT_METHOD(updateCall:(NSString *)callUUID
 }
 
 #pragma mark - Helper methods
-
-- (void)configureProviderFromDictionary:(NSDictionary* )dictionary {
-    DDLogInfo(@"[RNCallKit][providerConfigurationFromDictionary: %@]", dictionary);
-
-    if (!dictionary) {
-        dictionary = @{};
-    }
-
-    // localizedName
-    NSString *localizedName = dictionary[@"localizedName"];
-    if (!localizedName) {
-        localizedName
-            = [[NSBundle mainBundle] infoDictionary][@"CFBundleDisplayName"];
-    }
-
-    // iconTemplateImageData
-    NSString *iconTemplateImageName = dictionary[@"iconTemplateImageName"];
-    NSData *iconTemplateImageData;
-    UIImage *iconTemplateImage;
-    if (iconTemplateImageName) {
-        // First try to load the resource from the main bundle.
-        iconTemplateImage = [UIImage imageNamed:iconTemplateImageName];
-
-        // If that didn't work, use the one built-in.
-        if (!iconTemplateImage) {
-            iconTemplateImage = [UIImage imageNamed:iconTemplateImageName
-                                           inBundle:[NSBundle bundleForClass:self.class]
-                      compatibleWithTraitCollection:nil];
-        }
-
-        if (iconTemplateImage) {
-            iconTemplateImageData = UIImagePNGRepresentation(iconTemplateImage);
-        }
-    }
-
-    NSString *ringtoneSound = dictionary[@"ringtoneSound"];
-
-    [JMCallKitProxy
-        configureProviderWithLocalizedName:localizedName
-                             ringtoneSound:ringtoneSound
-                     iconTemplateImageData:iconTemplateImageData];
-}
 
 - (void)requestTransaction:(CXTransaction *)transaction
                    resolve:(RCTPromiseResolveBlock)resolve
