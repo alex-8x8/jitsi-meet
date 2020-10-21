@@ -39,7 +39,7 @@ public protocol CXProviderProtocol: class {
 
     // MARK: - CallKit proxy
 
-    static var provider: CXProviderProtocol? {
+    public static var provider: CXProviderProtocol? {
         willSet {
             provider?.setDelegate(nil, queue: nil)
         }
